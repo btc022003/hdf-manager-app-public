@@ -6,8 +6,8 @@ import {
   VideoCameraOutlined,
   DashboardOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Layout, Menu, message } from 'antd';
-import React, { useState } from 'react';
+import { Breadcrumb, Dropdown, Layout, Menu, message } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { defaultImg as logo } from '../utils/tools';
 
@@ -77,11 +77,41 @@ const findOpenKeys = (key: string) => {
   return result;
 };
 
+/**
+ * 获取当前选中的数据的所有父节点
+ * @param key
+ * @returns
+ */
+const findDeepPath = (key: string) => {
+  const result: any = []; // 处理完所有的menu数据成为一个一维数组
+  const findInfo = (arr: any) => {
+    arr.forEach((item: any) => {
+      const { children, ...info } = item;
+      result.push(info);
+      if (children) {
+        findInfo(children); // 递归处理子节点
+      }
+    });
+  };
+  findInfo(sideMenuData);
+  // 根据当前传递的key值过滤数据，获取到当前用来显示的menu item数据
+  const tmpData = result.filter((item: any) => key.includes(item.key));
+  if (tmpData.length > 0) {
+    return [{ label: '首页', key: '/admin/dashboard' }, ...tmpData];
+  }
+  return [];
+};
+
 const MyLayout = ({ children }: any) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [breadcrumbs, setBreadcrumbs] = useState<any>([]);
   const navigate = useNavigate();
   const { pathname } = useLocation(); // 获取location中的数据
   const tmpOpenKeys = findOpenKeys(pathname);
+  // 监听pathname的改变，重新这是面包屑数据
+  useEffect(() => {
+    setBreadcrumbs(findDeepPath(pathname));
+  }, [pathname]);
   return (
     <Layout
       style={{ width: '100vw', height: '100vh' }}
@@ -156,6 +186,13 @@ const MyLayout = ({ children }: any) => {
             minHeight: 280,
           }}
         >
+          <Breadcrumb>
+            {breadcrumbs.map((item: any) => (
+              <Breadcrumb.Item>{item.label}</Breadcrumb.Item>
+            ))}
+
+            {/* <Breadcrumb.Item>Ant Design</Breadcrumb.Item> */}
+          </Breadcrumb>
           {children}
         </Content>
       </Layout>
