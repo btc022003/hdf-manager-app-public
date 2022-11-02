@@ -8,14 +8,80 @@ import {
 } from '@ant-design/icons';
 import { Dropdown, Layout, Menu, message } from 'antd';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { defaultImg as logo } from '../utils/tools';
 
 const { Header, Sider, Content } = Layout;
 
+const sideMenuData = [
+  {
+    key: '/admin/dashboard',
+    icon: <DashboardOutlined />,
+    label: '看板',
+  },
+  {
+    key: '/admin/medicine',
+    icon: <VideoCameraOutlined />,
+    label: '药品管理',
+    children: [
+      {
+        label: '药品分类',
+        key: '/admin/medicine/categories',
+      },
+      {
+        label: '药品信息',
+        key: '/admin/medicine/list',
+      },
+    ],
+  },
+  {
+    key: '/admin/articles',
+    icon: <UploadOutlined />,
+    label: '文章管理',
+    children: [
+      {
+        label: '文章分类',
+        key: '/admin/articles/categories',
+      },
+      {
+        label: '文章信息',
+        key: '/admin/articles/list',
+      },
+    ],
+  },
+  {
+    key: '/admin/users',
+    icon: <UserOutlined />,
+    label: '会员信息',
+  },
+];
+
+/**
+ * 查找当前选中的menu菜单的值
+ * @param key
+ * @returns
+ */
+const findOpenKeys = (key: string) => {
+  const result: string[] = [];
+  const findInfo = (arr: any) => {
+    arr.forEach((item: any) => {
+      if (key.includes(item.key)) {
+        result.push(item.key);
+        if (item.children) {
+          findInfo(item.children); // 使用递归的方式查找当前页面刷新之后的默认选中项
+        }
+      }
+    });
+  };
+  findInfo(sideMenuData);
+  return result;
+};
+
 const MyLayout = ({ children }: any) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation(); // 获取location中的数据
+  const tmpOpenKeys = findOpenKeys(pathname);
   return (
     <Layout
       style={{ width: '100vw', height: '100vh' }}
@@ -28,53 +94,13 @@ const MyLayout = ({ children }: any) => {
         <Menu
           theme='light'
           mode='inline'
-          defaultSelectedKeys={['1']}
+          defaultOpenKeys={tmpOpenKeys}
+          defaultSelectedKeys={tmpOpenKeys}
           onClick={({ key }) => {
             // alert(key);
             navigate(key);
           }}
-          items={[
-            {
-              key: '/admin/dashboard',
-              icon: <DashboardOutlined />,
-              label: '看板',
-            },
-            {
-              key: '/admin/medicine',
-              icon: <VideoCameraOutlined />,
-              label: '药品管理',
-              children: [
-                {
-                  label: '药品分类',
-                  key: '/admin/medicine/categories',
-                },
-                {
-                  label: '药品信息',
-                  key: '/admin/medicine/list',
-                },
-              ],
-            },
-            {
-              key: '/admin/articles',
-              icon: <UploadOutlined />,
-              label: '文章管理',
-              children: [
-                {
-                  label: '文章分类',
-                  key: '/admin/articles/categories',
-                },
-                {
-                  label: '文章信息',
-                  key: '/admin/articles/list',
-                },
-              ],
-            },
-            {
-              key: '/admin/users',
-              icon: <UserOutlined />,
-              label: '会员信息',
-            },
-          ]}
+          items={sideMenuData}
         />
       </Sider>
       <Layout className='site-layout'>
