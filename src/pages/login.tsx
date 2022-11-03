@@ -1,6 +1,7 @@
 import { Row, Col, Card, Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { defaultImg } from '../utils/tools';
+import { loginAPI } from '../services/auth';
+import { defaultImg, setToken } from '../utils/tools';
 
 function Login() {
   const navigate = useNavigate();
@@ -32,10 +33,19 @@ function Login() {
                 span: 4,
               },
             }}
-            onFinish={(v) => {
-              console.log(v);
-              message.success('登录成功');
-              navigate('/admin/dashboard');
+            onFinish={async (v) => {
+              // console.log(v);
+              const res = await loginAPI(v);
+              console.log(res);
+              if (res.success) {
+                message.success('登录成功');
+                setToken(res.data);
+                navigate('/admin/dashboard');
+              } else {
+                message.error(res.errorMessage);
+              }
+              // message.success('登录成功');
+              // navigate('/admin/dashboard');
             }}
           >
             <Form.Item
