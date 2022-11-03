@@ -3,6 +3,7 @@ import { message, Upload } from 'antd';
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import React, { useState } from 'react';
+import { dalImg, uploadActionUrl } from '../utils/tools';
 
 const getBase64 = (img: RcFile, callback: (url: string) => void) => {
   const reader = new FileReader();
@@ -22,9 +23,14 @@ const beforeUpload = (file: RcFile) => {
   return isJpgOrPng && isLt2M;
 };
 
-const MyUpload = () => {
+type MyUploadProps = {
+  imageUrl: string;
+  setImageUrl: any;
+};
+
+const MyUpload = ({ imageUrl, setImageUrl }: MyUploadProps) => {
   const [loading, setLoading] = useState(false); // 加载状态
-  const [imageUrl, setImageUrl] = useState<string>(); // 上传之后的数据
+  // const [imageUrl, setImageUrl] = useState<string>(); // 上传之后的数据
 
   // 在上传进度改变的时候执行
   const handleChange: UploadProps['onChange'] = (
@@ -37,10 +43,12 @@ const MyUpload = () => {
     // 完成
     if (info.file.status === 'done') {
       // Get this url from response in real world.
-      getBase64(info.file.originFileObj as RcFile, (url) => {
-        setLoading(false);
-        setImageUrl(url);
-      });
+      // getBase64(info.file.originFileObj as RcFile, (url) => {
+      //   setLoading(false);
+      //   setImageUrl(url);
+      // });
+      setLoading(false);
+      setImageUrl(info.file.response.data);
     }
   };
 
@@ -54,17 +62,17 @@ const MyUpload = () => {
   return (
     <Upload
       // name 表示服务器端接口接收的数据的属性名
-      name='avatar'
+      name='file'
       listType='picture-card'
       className='avatar-uploader'
       showUploadList={false}
       // action 表示服务器端的文件上传接口地址
-      action='https://www.mocky.io/v2/5cc8019d300000980a055e76'
+      action={uploadActionUrl}
       beforeUpload={beforeUpload}
       onChange={handleChange}
     >
       {imageUrl ? (
-        <img src={imageUrl} alt='avatar' style={{ width: '100%' }} />
+        <img src={dalImg(imageUrl)} alt='avatar' style={{ width: '100%' }} />
       ) : (
         uploadButton
       )}

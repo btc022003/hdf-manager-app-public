@@ -133,7 +133,10 @@ const MyLayout = ({ children }: any) => {
           items={sideMenuData}
         />
       </Sider>
-      <Layout className='site-layout'>
+      <Layout
+        className='site-layout'
+        style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+      >
         <Header className='site-layout-background' style={{ padding: 0 }}>
           {React.createElement(
             collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
@@ -181,9 +184,11 @@ const MyLayout = ({ children }: any) => {
         <Content
           className='site-layout-background'
           style={{
-            margin: '24px 16px',
+            margin: '8px',
             padding: 24,
             minHeight: 280,
+            overflow: 'auto',
+            flex: 1,
           }}
         >
           <Breadcrumb>

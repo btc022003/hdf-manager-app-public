@@ -8,6 +8,11 @@ export const defaultImg = logo;
 export const serverUrl = 'http://localhost:3006';
 
 /**
+ * 文件上传接口
+ */
+export const uploadActionUrl = serverUrl + '/common/upload';
+
+/**
  * 设置token
  * @param token
  * @returns
@@ -20,3 +25,16 @@ export const setToken = (token: string) =>
  * @returns
  */
 export const getToken = () => sessionStorage.getItem('token');
+
+/**
+ * 图片处理
+ * @param img
+ * @returns
+ */
+export const dalImg = (img: string) => {
+  if (img) {
+    if (img.startsWith('http')) return img;
+    return serverUrl + img;
+  }
+  return defaultImg;
+};
