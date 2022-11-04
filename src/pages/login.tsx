@@ -1,10 +1,13 @@
 import { Row, Col, Card, Form, Input, Button, message } from 'antd';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { context } from '../components/AppProvider';
 import { loginAPI } from '../services/auth';
 import { defaultImg, setToken } from '../utils/tools';
 
 function Login() {
   const navigate = useNavigate();
+  const { resetMenus } = useContext(context);
   return (
     <Row>
       <Col
@@ -40,6 +43,8 @@ function Login() {
               if (res.success) {
                 message.success('登录成功');
                 setToken(res.data);
+                // 此处可以使用服务器返回的用户角色数据
+                resetMenus('admin'); // 重置路由菜单
                 navigate('/admin/dashboard');
               } else {
                 message.error(res.errorMessage);

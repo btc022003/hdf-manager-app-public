@@ -7,61 +7,19 @@ import {
   DashboardOutlined,
 } from '@ant-design/icons';
 import { Breadcrumb, Dropdown, Layout, Menu, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { defaultImg as logo } from '../utils/tools';
+import { context } from './AppProvider';
 
 const { Header, Sider, Content } = Layout;
-
-const sideMenuData = [
-  {
-    key: '/admin/dashboard',
-    icon: <DashboardOutlined />,
-    label: '看板',
-  },
-  {
-    key: '/admin/medicine',
-    icon: <VideoCameraOutlined />,
-    label: '药品管理',
-    children: [
-      {
-        label: '药品分类',
-        key: '/admin/medicine/categories',
-      },
-      {
-        label: '药品信息',
-        key: '/admin/medicine/list',
-      },
-    ],
-  },
-  {
-    key: '/admin/articles',
-    icon: <UploadOutlined />,
-    label: '文章管理',
-    children: [
-      {
-        label: '文章分类',
-        key: '/admin/articles/categories',
-      },
-      {
-        label: '文章信息',
-        key: '/admin/articles/list',
-      },
-    ],
-  },
-  {
-    key: '/admin/users',
-    icon: <UserOutlined />,
-    label: '会员信息',
-  },
-];
 
 /**
  * 查找当前选中的menu菜单的值
  * @param key
  * @returns
  */
-const findOpenKeys = (key: string) => {
+const findOpenKeys = (key: string, menus: any) => {
   const result: string[] = [];
   const findInfo = (arr: any) => {
     arr.forEach((item: any) => {
@@ -73,7 +31,7 @@ const findOpenKeys = (key: string) => {
       }
     });
   };
-  findInfo(sideMenuData);
+  findInfo(menus);
   return result;
 };
 
@@ -82,7 +40,7 @@ const findOpenKeys = (key: string) => {
  * @param key
  * @returns
  */
-const findDeepPath = (key: string) => {
+const findDeepPath = (key: string, menus: any) => {
   const result: any = []; // 处理完所有的menu数据成为一个一维数组
   const findInfo = (arr: any) => {
     arr.forEach((item: any) => {
@@ -93,7 +51,7 @@ const findDeepPath = (key: string) => {
       }
     });
   };
-  findInfo(sideMenuData);
+  findInfo(menus);
   // 根据当前传递的key值过滤数据，获取到当前用来显示的menu item数据
   const tmpData = result.filter((item: any) => key.includes(item.key));
   if (tmpData.length > 0) {
@@ -103,14 +61,17 @@ const findDeepPath = (key: string) => {
 };
 
 const MyLayout = ({ children }: any) => {
+  const { menus } = useContext(context);
+
   const [collapsed, setCollapsed] = useState(false);
   const [breadcrumbs, setBreadcrumbs] = useState<any>([]);
   const navigate = useNavigate();
   const { pathname } = useLocation(); // 获取location中的数据
-  const tmpOpenKeys = findOpenKeys(pathname);
+  const tmpOpenKeys = findOpenKeys(pathname, menus);
+
   // 监听pathname的改变，重新这是面包屑数据
   useEffect(() => {
-    setBreadcrumbs(findDeepPath(pathname));
+    setBreadcrumbs(findDeepPath(pathname, menus));
   }, [pathname]);
   return (
     <Layout
@@ -130,7 +91,7 @@ const MyLayout = ({ children }: any) => {
             // alert(key);
             navigate(key);
           }}
-          items={sideMenuData}
+          items={menus}
         />
       </Sider>
       <Layout
@@ -193,7 +154,7 @@ const MyLayout = ({ children }: any) => {
         >
           <Breadcrumb>
             {breadcrumbs.map((item: any) => (
-              <Breadcrumb.Item>{item.label}</Breadcrumb.Item>
+              <Breadcrumb.Item key={item.key}>{item.label}</Breadcrumb.Item>
             ))}
 
             {/* <Breadcrumb.Item>Ant Design</Breadcrumb.Item> */}

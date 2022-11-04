@@ -1,22 +1,21 @@
+import { useContext } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { context } from './components/AppProvider';
 import MyLayout from './components/MyLayout';
-import ArticleCategories from './pages/articles/categories';
-import ArticleList from './pages/articles/list';
-import Dashboard from './pages/dashboard';
-import MedicineCategories from './pages/medicine/categories';
-import MedicineList from './pages/medicine/list';
-import Users from './pages/user';
 
 function App() {
+  const { routes } = useContext(context);
+  console.log(routes);
   return (
     <MyLayout>
       <Routes>
-        <Route path='dashboard' element={<Dashboard />} />
-        <Route path='users' element={<Users />} />
-        <Route path='articles/list' element={<ArticleList />} />
-        <Route path='articles/categories' element={<ArticleCategories />} />
-        <Route path='medicine/list' element={<MedicineList />} />
-        <Route path='medicine/categories' element={<MedicineCategories />} />
+        {routes.map((item: any) => (
+          <Route
+            key={item.key}
+            path={item.key?.replace('/admin/', '')}
+            element={item.element}
+          />
+        ))}
       </Routes>
     </MyLayout>
   );
