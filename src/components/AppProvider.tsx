@@ -120,11 +120,20 @@ function flatRoutes(menus: any) {
 }
 
 function AppProvider({ children }: any) {
-  const [menus, setMenus] = useState();
-  const [routes, setRoutes] = useState([]);
+  // 初始化的时候从本地存储获取角色信息
+  let defaultMenus = [];
+  let defaultRoutes = [];
+  const oldRole = sessionStorage.getItem('role');
+  if (oldRole) {
+    defaultMenus = findRoles(oldRole);
+    defaultRoutes = flatRoutes(defaultMenus);
+  }
+  const [menus, setMenus] = useState(defaultMenus);
+  const [routes, setRoutes] = useState(defaultRoutes);
 
   // 根据当前的角色生成路由数组和侧边栏数组
   const resetMenus = (role: string) => {
+    sessionStorage.setItem('role', role);
     // 此处重置菜单和路由数据
     const tmpMenu = findRoles(role);
     setMenus(tmpMenu);

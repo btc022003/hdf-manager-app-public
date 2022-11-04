@@ -5,7 +5,7 @@ import MyLayout from './components/MyLayout';
 
 function App() {
   const { routes } = useContext(context);
-  console.log(routes);
+
   return (
     <MyLayout>
       <Routes>

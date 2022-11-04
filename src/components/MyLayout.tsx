@@ -108,27 +108,27 @@ const MyLayout = ({ children }: any) => {
           )}
           <span className='app-title'>好大夫平台管理系统</span>
           <Dropdown
-            overlay={
-              <Menu
-                onClick={({ key }) => {
-                  if (key === 'logOut') {
-                    navigate('/');
-                  } else {
-                    message.info('暂未开通');
-                  }
-                }}
-                items={[
-                  {
-                    label: '个人中心',
-                    key: 'userCenter',
-                  },
-                  {
-                    label: '退出',
-                    key: 'logOut',
-                  },
-                ]}
-              />
-            }
+            menu={{
+              items: [
+                {
+                  label: '个人中心',
+                  key: 'userCenter',
+                },
+                {
+                  label: (
+                    <span
+                      onClick={() => {
+                        // console.log('退出');
+                        navigate('/');
+                      }}
+                    >
+                      退出
+                    </span>
+                  ),
+                  key: 'logOut',
+                },
+              ],
+            }}
           >
             <img
               src={logo}
