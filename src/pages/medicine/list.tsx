@@ -27,6 +27,7 @@ import {
 } from '../../services/medicines';
 import { loadDataAPI as loadCategoriesAPI } from '../../services/medicine-categories';
 import { dalImg } from '../../utils/tools';
+import MyEditor from '../../components/MyEditor';
 
 function MedicineList() {
   const [isShow, setIsShow] = useState(false); // 控制modal显示和隐藏
@@ -37,6 +38,9 @@ function MedicineList() {
   const [currentId, setCurrentId] = useState(''); // 当前id，如果为空表示新增
   const [imageUrl, setImageUrl] = useState<string>(''); // 上传之后的数据
   const [categories, setCategories] = useState([]); // 分类信息
+
+  // 编辑器内容
+  const [html, setHtml] = useState('');
 
   useEffect(() => {
     loadDataAPI(query).then((res) => {
@@ -50,6 +54,7 @@ function MedicineList() {
       // 关闭弹窗之后重置数据
       setCurrentId('');
       setImageUrl('');
+      setHtml('');
     }
   }, [isShow]);
   useEffect(() => {
@@ -143,7 +148,7 @@ function MedicineList() {
                 title: '操作',
                 align: 'center',
                 width: 110,
-                render(v, r: any) {
+                render(v, r: MedicineInfo.Medicine) {
                   return (
                     <Space>
                       <Button
@@ -154,6 +159,7 @@ function MedicineList() {
                           setIsShow(true);
                           setCurrentId(r.id);
                           setImageUrl(r.image);
+                          setHtml(r.content);
                           myForm.setFieldsValue(r);
                         }}
                       />
@@ -192,6 +198,7 @@ function MedicineList() {
         </Space>
       </Card>
       <Modal
+        width='1000px'
         title='编辑'
         open={isShow}
         // 点击遮罩层时不关闭
@@ -211,9 +218,13 @@ function MedicineList() {
             // message.success('保存成功');
             // console.log(v);
             if (currentId) {
-              await updateByIdAPI(currentId, { ...v, image: imageUrl }); // 修改
+              await updateByIdAPI(currentId, {
+                ...v,
+                image: imageUrl,
+                content: html,
+              }); // 修改
             } else {
-              await insertAPI({ ...v, image: imageUrl }); // 新增
+              await insertAPI({ ...v, image: imageUrl, content: html }); // 新增
             }
 
             message.success('保存成功');
@@ -249,6 +260,9 @@ function MedicineList() {
           </Form.Item>
           <Form.Item label='简介' name='desc'>
             <Input.TextArea placeholder='请输入简介' />
+          </Form.Item>
+          <Form.Item label='详情'>
+            <MyEditor html={html} setHtml={setHtml} />
           </Form.Item>
         </Form>
       </Modal>
